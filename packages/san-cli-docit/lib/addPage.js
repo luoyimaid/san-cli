@@ -3,6 +3,7 @@
  * @author ksky521
  */
 const path = require('path');
+const qs = require('querystring');
 const fs = require('fs');
 const grayMatter = require('gray-matter');
 const {debug, error} = require('san-cli-utils/ttyLogger');
@@ -22,7 +23,7 @@ function getChunkNameFromFilePath(filepath) {
     return (chunkname + '-' + name).replace(/^-+/, '');
 }
 const cachedMap = {};
-module.exports = (layouts, output, files, context, webpackConfig, siteData) => {
+module.exports = (files, {layouts, output, context, webpackConfig, siteData}) => {
     const HTMLPlugin = require('html-webpack-plugin');
     let htmlPath;
     if (cachedMap[context]) {
@@ -57,7 +58,7 @@ module.exports = (layouts, output, files, context, webpackConfig, siteData) => {
                 absoluteFile: path.resolve(context, filepath)
             });
         })
-        .map(({filepath, absoluteFile, filename, chunkname}) => {
+        .map(({filepath, absoluteFile, filename, chunkname, layout}) => {
             if (!filename) {
                 const parsed = path.parse(filepath);
                 parsed.ext = '.html';
@@ -67,13 +68,13 @@ module.exports = (layouts, output, files, context, webpackConfig, siteData) => {
             if (!chunkname) {
                 chunkname = getChunkNameFromFilePath(filepath);
             }
-            return {filepath, absoluteFile, filename, chunkname};
+            return {filepath, absoluteFile, filename, chunkname, layout};
         })
-        .forEach(({filepath, absoluteFile, filename, chunkname}) => {
+        .forEach(({filepath, absoluteFile, filename, chunkname, layout = 'Main'}) => {
             const content = fs.readFileSync(absoluteFile);
             const frontMatter = grayMatter(content);
             const matter = frontMatter.data || {};
-            let entry = layouts.Main;
+            let entry = layouts[layout] ? layouts[layout] : layouts.Main;
             if (matter.layout) {
                 if (layouts[matter.layout]) {
                     // 存在
@@ -85,29 +86,36 @@ module.exports = (layouts, output, files, context, webpackConfig, siteData) => {
                 }
             }
             // 读取下 matter 信息，传入进去，替换 title 等
-            const pageHtmlOptions = Object.assign(
+            siteData = Object.assign(
                 {
                     title: 'San Docit'
                 },
                 siteData,
-                matter,
-                {
-                    compile: false,
-                    rootUrl: siteData.rootUrl,
-                    chunks: ['common', 'vendors', chunkname],
-                    template: templatePath,
-                    filename
-                }
+                matter
             );
+            const pageHtmlOptions = Object.assign(siteData, {
+                compile: false,
+                rootUrl: siteData.rootUrl,
+                chunks: ['common', 'vendors', chunkname],
+                template: templatePath,
+                filename
+            });
             // 删除没用的
             delete pageHtmlOptions.layouts;
 
+            const query = qs.stringify({
+                md: absoluteFile
+            });
             // 添加个 query，然后在 resolve plugin 获取它
-            webpackConfig
-                .entry(chunkname)
-                .add(absoluteFile)
-                .add(`${entry}`);
+            webpackConfig.entry(chunkname).add(`${entry}?${query}`);
             webpackConfig.plugin(`html-${chunkname}`).use(HTMLPlugin, [pageHtmlOptions]);
+            const baseRule = webpackConfig.module.rule('entry-loader').test(a => {
+                return new RegExp(entry).test(a);
+            });
+            baseRule
+                .use('entry-loader')
+                .loader(require.resolve('../loaders/entryLoader'))
+                .options(siteData);
         });
 };
 function ensureRelative(outputDir, p) {

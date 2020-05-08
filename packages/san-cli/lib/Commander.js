@@ -210,6 +210,7 @@ module.exports = class Command {
             .wrap(this.cli.terminalWidth() - 30)
             .middleware(getCommonArgv)
             .help()
+            // .recommendCommands()
             .check(a => {
                 // 检测没有的 command
                 const cmdName = a._[0];

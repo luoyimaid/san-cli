@@ -15,23 +15,6 @@ const {FancyReporter} = require('consola');
 const {chalkColor, chalkBgColor} = require('./color');
 const randomColor = require('./randomColor').color;
 
-const RULES = [
-    {
-        type: 'Cant-find-module',
-        re: /Cannot find module '(.+?)'/,
-        msg: match => `Cannot find module: \`${match[1]}\``
-    },
-    {
-        type: 'Type-error',
-        re: /^([\.\w]+) is not a (\w+)$/,
-        msg: match => `\`${match[1]}\` is not a ${match[2]}`
-    },
-    {
-        type: 'Cant-read-property',
-        re: /^Cannot read property '(.+)' of (\w+)$/,
-        msg: match => `Cannot read property \`${match[1]}\` of ${match[2]}`
-    }
-];
 
 const TYPE_ICONS = {
     info: figures('ℹ'),
@@ -85,18 +68,9 @@ module.exports = class ConsolaReporter extends FancyReporter {
         const date = secondaryColor(
             logObj.date.toLocaleTimeString ? logObj.date.toLocaleTimeString() : this.formatDate(logObj.date)
         );
-
         const type = this.formatType(logObj, isBadge);
 
         const tag = logObj.tag ? secondaryColor(logObj.tag) : '';
-
-        // 美化错误
-        for (const {re, msg, type} of RULES) {
-            const match = message.match(re);
-            if (match) {
-                message = msg(match);
-            }
-        }
 
         const formattedMessage = message.replace(/`([^`]+)`/g, (_, m) => chalk.cyan(m));
 
@@ -109,7 +83,8 @@ module.exports = class ConsolaReporter extends FancyReporter {
 
         if (space > 0 && width >= 80) {
             line = left + ' '.repeat(space) + right;
-        } else {
+        }
+        else {
             line = left;
         }
 
