@@ -1,0 +1,133 @@
+{
+    "title": "项目管理器",
+    "project": {
+        "select": {
+            "menu": [{
+                "text": "项目管理",
+                "icon": "unordered-list",
+                "key": "list",
+                "link": "/project/list"
+            }, {
+                "text": "创建项目",
+                "icon": "plus",
+                "key": "create",
+                "link": "/project/create"
+            }, {
+                "text": "导入项目",
+                "icon": "import",
+                "key": "import",
+                "link": "/project/import"
+            }
+        ],
+            "folderExplorer": {
+                "placeholder": {
+                    "edit": "请输入合法路径",
+                    "create": "请输入合法文件夹名称"
+                },
+                "tooltip": {
+                    "pre": "上一页面",
+                    "edit": "编辑",
+                    "refresh": "刷新",
+                    "star": "添加/取消收藏",
+                    "starDirs": "收藏的文件夹"
+                },
+                "menu": {
+                    "createFolder": "新建文件夹",
+                    "hiddenFolderShow": "显示隐藏文件夹",
+                    "hiddenFolder": "不显示隐藏文件夹",
+                    "createTitle": "输入文件夹名称"
+                },
+                "modalCreateTitle": "输入文件夹名称"
+            },
+            "create": {
+                "initProject": "在此创建工程",
+                "prev": "上一步",
+                "createProject": "确认创建"
+            },
+            "import": {
+                "importBtnText": "导入此文件夹"
+            }
+        },
+        "list": {
+            "searchPlaceholder": "请输入项目关键字",
+            "emptyTip": "暂无项目",
+            "collectionTitle": "收藏的项目",
+            "listTitle": "全部项目",
+            "modal": {
+                "tip": "输入新名称",
+                "placeholder": "请输入合法名称",
+                "oktext": "重命名"
+            },
+            "tooltip": {
+                "collect": "收藏",
+                "cancelCollect": "取消收藏",
+                "editor": "在编辑器中打开",
+                "rename": "修改项目显示名称",
+                "del": "删除"
+            }
+        },
+        "components": {
+            "create": {
+                "folderName": "项目文件夹",
+                "submitText": "开始创建",
+                "cancelSubmitText": "取消创建",
+                "spinTip": "正在创建项目..."
+            }
+        }   
+    },
+    "detail": {
+        "title": {
+            "dashboard": "项目仪表盘",
+            "plugin": "插件",
+            "dependency": "项目依赖",
+            "configuration": "项目配置",
+            "task": "任务"
+        },
+        "menu": [
+            {
+                "text": "仪表盘",
+                "icon": "dashboard",
+                "key": "dashboard",
+                "link": "/dashboard"
+            },
+            {
+                "text": "插件",
+                "icon": "deployment-unit",
+                "key": "plugin",
+                "link": "/plugin"
+            },
+            {
+                "text": "依赖",
+                "icon": "apartment",
+                "key": "dependency",
+                "link": "/dependency"
+            },
+            {
+                "text": "配置",
+                "icon": "setting",
+                "key": "configuration",
+                "link": "/configuration"
+            },
+            {
+                "text": "任务",
+                "icon": "schedule",
+                "key": "task",
+                "link": "/task"
+            }
+        ],
+        "customBtnText": "自定义"
+    },
+    "connection-status": {
+        "disconnected": "连接已断开",
+        "connected": "已连接"
+    },
+    "confirmText": "确定",
+    "pre": "上一步",
+    "next": "下一步",
+    "scaffold": {
+        "chooseLabel": "选择脚手架模板",
+        "choosePlaceholder": "请选择脚手架模板",
+        "customLabel": "自定义模板地址",
+        "optionLabel": "自定义脚手架模板"
+    }
+}

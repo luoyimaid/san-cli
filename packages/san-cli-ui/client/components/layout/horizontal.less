@@ -1,0 +1,84 @@
+.hlayout {
+    .santd-layout-header {
+        width: 100%;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+        border-bottom: 1px solid #e8e8e8;
+        .header {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            justify-content: space-between;
+        }
+        .title {
+            margin-right: 40px;
+            padding: 0 16px;
+            color: #333;
+            font-size: 18px;
+            cursor: pointer;
+            font-size: 24px;
+            white-space: nowrap;
+        }
+        .santd-menu-horizontal {
+            width: 600px;
+            flex-grow: 1;
+            height: 62px;
+            line-height: 62px;
+            border-bottom: 0;
+            li {
+                margin-left: 50px;
+            }
+            a {
+                font-size: 18px;
+                text-decoration: none;
+            }
+        }
+        .head-right {
+            text-align: right;
+            padding-right: 16px;
+            a {
+                color: rgba(0, 0, 0, .65);
+            }
+        }
+    }
+    .santd-layout-content  {
+        background: #fff;
+        flex: 1 1 100%;
+        height: 0;
+    }
+    .main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 46px 16px 0;
+    }
+
+    .custom-santd-btn {
+        padding-left: 28px !important;
+        padding-right: 28px !important;
+        height: 48px;
+    }
+}
+
+.empty-tip {
+    display: flex;
+    height: 600px;
+    align-items: center;
+    > div {
+        width: 100%;
+    }
+    .santd-icon {
+        display: block;
+        margin: 0 auto;
+        color: #999;
+        svg {
+            width: 100px;
+            height: 100px;
+        }
+    }
+    .tip-text {
+        display: block;
+        text-align: center;
+        margin-top: 30px;
+        color: #999;
+    }
+}

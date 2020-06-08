@@ -1,0 +1,18 @@
+mutation projectInitTemplate ($template: String) {
+  projectInitTemplate (template: $template) {
+    prompts {
+      name
+      type
+      label
+      message
+      required
+      default
+      when
+      choices {
+        name
+        value
+        short
+      }
+    }
+  }
+}

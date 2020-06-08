@@ -8,13 +8,24 @@
  * @author yanyiting
  */
 
-jest.mock('rxjs');
+const hash = require('hash-sum');
 const download = require('../tasks/download');
 
 function Task() {
-    this.str = '';
+    this.skipInfo = [];
+    this.nextInfo = [];
+    this.res = '';
     this.skip = data => {
-        this.str = data;
+        this.skipInfo.push(data);
+    };
+    this.info = data => {
+        this.nextInfo.push(data);
+    };
+    this.error = err => {
+        this.res = err;
+    };
+    this.complete = () => {
+        this.res = 'done';
     };
 }
 
@@ -27,34 +38,32 @@ test('使用本地路径localTemplatePath', async () => {
     await download('https://github.com/yyt/HelloWorld.git', 'none', {})({
         localTemplatePath: 'User/yyt'
     }, task)
-        .then(data => {
-            expect(task.str).toBe('Use local path `User/yyt`');
-            expect(data.complete).toBeTruthy();
+        .then(() => {
+            expect(task.skipInfo).toEqual(['Use local path `User/yyt`']);
+            expect(task.res).toBe('done');
         });
 });
 
 test('使用本地缓存&&发现本地缓存', async () => {
     await download('exist', 'none', {
         useCache: true
-    })({}, task).then(data => {
-        expect(task.str).toBe('Discover local cache and use it');
-        expect(data.complete).toBeTruthy();
+    })({}, task).then(() => {
+        expect(task.skipInfo).toEqual(['Discover local cache and use it']);
+        expect(task.res).toBe('done');
     });
 });
 
 test('远程拉取成功', async () => {
     let ctx = {};
+    const template = 'github:yyt/HelloWorld';
     await download(
-        'github:yyt/HelloWorld',
+        template,
         'none',
         {}
-    )(ctx, task).then(data => {
-        expect(ctx.localTemplatePath).toMatch('.san/templates/HelloWorld');
-        expect(data).toEqual({
-            next: ['Pulling template from the remote repository...'],
-            error: '',
-            complete: true
-        });
+    )(ctx, task).then(() => {
+        expect(ctx.localTemplatePath).toMatch(`.san/templates/${hash(template)}/HelloWorld`);
+        expect(task.nextInfo).toEqual(['Pulling template from the remote repository...']);
+        expect(task.res).toBe('done');
     });
 });
 
@@ -64,7 +73,7 @@ test('远程拉取失败', async () => {
         '',
         'none',
         {}
-    )(ctx, task).then(data => {
+    )(ctx, task).then(() => {
     }).catch(e => {
         expect(e.toString()).toEqual(expect.stringMatching(/please check the path and code permissions are correct/));
     });

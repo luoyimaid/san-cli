@@ -1,8 +1,9 @@
 /**
  * @file command Component
- * @author wangyongqing <wangyongqing01@baidu.com>
+ * @author jinzhan
  */
 const path = require('path');
+const openBrowser = require('@jinzhan/open-browser');
 exports.builder = {
     port: {
         alias: 'p',
@@ -27,20 +28,31 @@ exports.command = 'ui';
 
 exports.handler = cliApi => {
     const {host, port} = cliApi;
-    const distPath = path.join(__filename, './dist');
-    const publicPath = path.join(__filename, './public');
+    const distPath = path.join(__dirname, './dist');
+    const publicPath = path.join(__dirname, './public');
 
     const createServer = require('./server/');
-    createServer({host, port, distPath, publicPath})
+    createServer({
+        host,
+        port,
+        distPath,
+        publicPath,
+        graphqlPath: '/graphql',
+        subscriptionsPath: '/graphql',
+        cors: {
+            origin: host
+        }
+    })
         .then(({host, port}) => {
             const networkUrl = `http://${host}:${port}`;
             const {textColor} = require('san-cli-utils/randomColor');
             /* eslint-disable no-console */
             console.log();
-            console.log(`  Application is running at: ${textColor(networkUrl)}`);
-            console.log('  URL QRCode is: ');
-            // 打开浏览器地址
-            cliApi.open && require('opener')(networkUrl);
+            console.log(`✨ Application is running at: ${textColor(networkUrl)}`);
+            if (process.env.SAN_CLI_UI_DEV !== 'true') {
+                // 打开浏览器地址
+                openBrowser(networkUrl);
+            }
         })
         .catch(e => {
             console.log(e);

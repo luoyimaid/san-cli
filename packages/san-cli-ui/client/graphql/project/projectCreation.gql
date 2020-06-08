@@ -1,0 +1,18 @@
+mutation projectCreation ($name: String, $template: String, $presets: JSON) {
+  projectCreation (name: $name, template: $template, presets: $presets) {
+    prompts {
+      name
+      type
+      label
+      message
+      required
+      default
+      when
+      choices {
+        name
+        value
+        short
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+.connection-status {
+    color: #fff;
+    height: 45px;
+    position: relative;
+    transition: margin-top .2s ease-out .05s;
+    .content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 90000;
+        .santd-icon {
+            margin-right: 10px;
+        }
+    }
+    .connected {
+        background-color: #52c41a;
+    }
+    .disconnected {
+        background-color: #f5222d;
+    }
+}
+
+.connection-animation {
+    margin-top: -45px;
+}
