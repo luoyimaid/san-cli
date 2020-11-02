@@ -47,12 +47,10 @@ exports.builder = {
     },
     'stats-json': {
         alias: 'stats',
-        type: 'boolean',
         default: false,
         describe: 'Generate webpack stats JSON file'
     },
     'report': {
-        type: 'boolean',
         default: false,
         describe: 'Generate bundle report HTML file'
     },
@@ -75,6 +73,14 @@ exports.builder = {
 };
 
 exports.handler = cliApi => {
+    if (!cliApi.mode) {
+        if (['development', 'production'].includes(process.env.NODE_ENV)) {
+            cliApi.mode = process.env.NODE_ENV;
+        }
+        else {
+            cliApi.mode = 'production';
+        }
+    }
     const callback = run.bind(run, cliApi);
     require('../../lib/service')('build', cliApi, callback);
 };

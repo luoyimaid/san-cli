@@ -7,7 +7,6 @@
  * @file 将 build 的 webpackConfig 处理拆出来
  * @author ksky521
  */
-
 const fse = require('fs-extra');
 const {resolveEntry} = require('san-cli-webpack/utils');
 const {error, chalk} = require('san-cli-utils/ttyLogger');
@@ -52,16 +51,18 @@ module.exports = function getNormalizeWebpackConfig(api, projectOptions, argv) {
     }
     else if (report || statsJson) {
         const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+        const {getReportFileName} = require('../../lib/utils');
         // 单独标示 modern 打包
         const bundleName = modern ? (modernBuild ? 'modern-' : 'legacy-') : '';
-
+        const reportFilename = getReportFileName(report, bundleName, 'report.html');
+        const statsFilename = getReportFileName(statsJson, bundleName, 'stats.json');
         chainConfig.plugin('bundle-analyzer').use(
             new BundleAnalyzerPlugin({
                 logLevel: 'warn',
                 openAnalyzer: false,
-                analyzerMode: report ? 'static' : 'disabled',
-                reportFilename: `${bundleName}report.html`,
-                statsFilename: `${bundleName}stats.json`,
+                analyzerMode: 'static',
+                reportFilename,
+                statsFilename,
                 generateStatsFile: !!statsJson
             })
         );
@@ -71,13 +72,22 @@ module.exports = function getNormalizeWebpackConfig(api, projectOptions, argv) {
         const DeployPlugin = require('deploy-files/webpack-plugin');
         // 从 env 文件中读取 remote 配置，这样可以将 env.local 加到 .gitignore 中防止提交
         // 详细配置：https://github.com/jinzhan/deploy-files
+        // host: 'http://YOUR_HOST'
         // receiver: 'http://YOUR_HOST/receiver',
         // templatePath: '/home/work/nginx_static/html/test/template',
         // staticPath: '//home/work/nginx_static/html/test/static',
         // staticDomain: 'http://test.com:8888'
-        const remoteObj = {};
+        // baseUrl: 'https://s.bdstatic.com/'
         const upperRemote = remote.toUpperCase();
-        ['receiver', 'templatePath', 'staticPath', 'staticDomain'].forEach(key => {
+        const requiredParam = ['templatePath', 'staticPath', 'staticDomain', 'baseUrl'];
+        const remoteObj = {
+            // 1. 默认取false;
+            // 2. process.env读取的内容为string，需转boolean
+            disableFsr: JSON.parse(process.env[`SAN_REMOTE_${upperRemote}_DISABLE_FSR`] || false)
+        };
+        requiredParam.push(remoteObj.disableFsr ? 'receiver' : 'host');
+
+        requiredParam.forEach(key => {
             // templatePath → TEMPLATE_PATH
             const upperKey = key.replace(/[A-Z]/g, $1 => `_${$1}`).toUpperCase();
             const val = process.env[`SAN_REMOTE_${upperRemote}_${upperKey}`];

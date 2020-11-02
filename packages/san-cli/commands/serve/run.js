@@ -13,7 +13,7 @@
 // 为了扩展，需要增加webpack 和 dev-server 的配置回调
 module.exports = function apply(argv, api, projectOptions) {
     const {info, error} = require('san-cli-utils/ttyLogger');
-    const mode = argv.mode || process.env.NODE_ENV || 'development';
+    const mode = argv.mode;
     info(`Starting ${mode} server...`);
 
     const devServer = require('san-cli-webpack/serve');
@@ -28,16 +28,17 @@ module.exports = function apply(argv, api, projectOptions) {
     })
         .then(({isFirstCompile, networkUrl}) => {
             if (isFirstCompile) {
-                const {textColor} = require('san-cli-utils/randomColor');
+                const {textCommonColor} = require('san-cli-utils/color');
                 /* eslint-disable no-console */
                 console.log();
-                console.log(`  Application is running at: ${textColor(networkUrl)}`);
-                console.log('  URL QRCode is: ');
-                /* eslint-enable no-console */
+
+                console.log(`  Application is running at: ${textCommonColor(networkUrl)}`);
+
                 // 打开浏览器地址
                 argv.open && require('opener')(networkUrl);
 
-                if (argv.qrcode) {
+                if (argv.qrcode && !argv.dashboard) {
+                    console.log('  URL QRCode is: ');
                     // 显示 terminal 二维码
                     require('qrcode-terminal').generate(
                         networkUrl,
@@ -51,6 +52,17 @@ module.exports = function apply(argv, api, projectOptions) {
                         }
                     );
                 }
+
+                if (argv.dashboard) {
+                    const {IpcMessenger} = require('san-cli-utils/ipc');
+                    const ipc = new IpcMessenger();
+                    ipc.send({
+                        sanCliServe: {
+                            url: networkUrl
+                        }
+                    });
+                }
+                /* eslint-enable no-console */
             }
         })
         .catch(({type, stats, err}) => {
